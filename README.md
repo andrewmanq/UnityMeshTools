@@ -18,7 +18,7 @@ addNgon() - takes a list of points + middlepoint and makes a triangle fan with t
 addCube() - makes a cube. First four points are clockwise on top, 2nd four points are clockwise on bottom.
 
 
-addRibbon() - a ribbon is just a series of quads that are sowed together side by side. The list must put each segment side by side:
+addRibbon() - a ribbon is just a series of quads that are sowed together side by side. The list should have points in a zigzag pattern:
 
 | 1 | 3 | 5 | 7   |
 |---|---|---|-----|

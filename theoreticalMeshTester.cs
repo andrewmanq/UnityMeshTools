@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -34,6 +34,41 @@ public class theoreticalMeshTester : MonoBehaviour {
             circle.Add(Quaternion.Euler(0, i, 0) * Vector3.forward);
         }
         t.addNgon(Vector3.zero, circle);
+
+        List<Vector3> circleRibbon = new List<Vector3>();
+        for(int i = circle.Count - 1; i >= 0; i--)
+        {
+            circleRibbon.Add(circle[i]);
+            circleRibbon.Add(circle[i] + (Vector3.down * .5f));
+        }
+        t.addRibbon(circleRibbon);
+
+        Vector3 topVec = Vector3.forward * 4;
+        Vector3 bottomVec = Vector3.forward * 3;
+        List<Vector3> rectangleRibbon = new List<Vector3>();
+        rectangleRibbon.Add(topVec);
+        rectangleRibbon.Add(bottomVec);
+        rectangleRibbon.Add(topVec + Vector3.right);
+        rectangleRibbon.Add(bottomVec + Vector3.right);
+        rectangleRibbon.Add(topVec + Vector3.right * 2 + Vector3.up * .5f);
+        rectangleRibbon.Add(bottomVec + Vector3.right * 2 + Vector3.up * .5f);
+        rectangleRibbon.Add(topVec + Vector3.right * 3);
+        rectangleRibbon.Add(bottomVec + Vector3.right * 3);
+
+        t.addRibbon(rectangleRibbon);
+
+        rectangleRibbon.Add(topVec + Vector3.right * 4);
+        rectangleRibbon.Add(bottomVec + Vector3.right * 4);
+
+        rectangleRibbon.Add(topVec + Vector3.right * 4 + Vector3.up);
+        rectangleRibbon.Add(bottomVec + Vector3.right * 4 + Vector3.up);
+
+        for (int i = 0; i < rectangleRibbon.Count; i++)
+        {
+            rectangleRibbon[i] += Vector3.forward * 2;
+        }
+
+        t.addRibbon(rectangleRibbon, 30);
 
         t.adopt(testMesh);
 

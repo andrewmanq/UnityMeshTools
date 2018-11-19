@@ -20,8 +20,6 @@ addCube() - makes a cube. First four points are clockwise on top, 2nd four point
 
 addRibbon() - a ribbon is just a series of quads that are sowed together side by side. The list must put each segment side by side:
 
-                           1---3---5---7
-                           
-example list and diagram:  |   |   |   |  etc....
-
-                           2---4---6---8
+| 1 | 3 | 5 | 7   |
+|---|---|---|-----|
+| 2 | 4 | 6 | ... |

@@ -21,6 +21,43 @@ public class theoreticalMesh {
         adopt(aMesh);
     }
 
+    public void addRaisedNgon(List<Vector3> points, float height, Vector3 direction, bool fillBottom)
+    {
+        List<Vector3> raisedPoints = new List<Vector3>();
+
+        for (int i = 0; i < points.Count; i++)
+        {
+            raisedPoints.Add( points[i] + direction * height);
+        }
+
+        addNgon(raisedPoints);
+
+        List<Vector3> ribbonPoints = new List<Vector3>();
+
+        for (int i = points.Count - 1; i >= 0; i--)
+        {
+            ribbonPoints.Add(raisedPoints[i]);
+            ribbonPoints.Add(points[i]);
+        }
+
+        ribbonPoints.Add(raisedPoints[points.Count - 1]);
+        ribbonPoints.Add(points[points.Count - 1]);
+
+        addRibbon(ribbonPoints, 10);
+
+        if (fillBottom)
+        {
+            List<Vector3> reversePoints = new List<Vector3>();
+
+            for(int i = points.Count - 1; i >= 0; i--)
+            {
+                reversePoints.Add(points[i]);
+            }
+
+            addNgon(reversePoints);
+        }
+    }
+
     /*
      * a ribbon is just a series of quads that are sowed together side by side. The list must put each segment side by side:
      *                            1---3---5---7

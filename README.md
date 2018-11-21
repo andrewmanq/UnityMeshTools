@@ -1,5 +1,5 @@
 # UnityMeshTools
-Makes mesh creation easier by adding an easily manipulated abstract mesh interface. I have yet to implement UV corrections.
+Makes mesh creation easier by adding an easily manipulated abstract mesh interface.
 
 # Here are all the methods in theoreticalMesh.cs so far:
 

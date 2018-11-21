@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class theoreticalMesh : MonoBehaviour {
+public class theoreticalMesh {
 
     private List<Vector3> verts;
     private List<int> tris;
+    private List<Vector2> uvs;
 
     public theoreticalMesh()
     {
         verts = new List<Vector3>();
         tris = new List<int>();
+        uvs = new List<Vector2>();
     }
 
     public theoreticalMesh(Mesh aMesh)
@@ -50,7 +52,14 @@ public class theoreticalMesh : MonoBehaviour {
 
         verts.Add(points[0]);
         verts.Add(points[1]);
+
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(0, 0));
+
         vertOffset += 2;
+
+        float uvDistance = 0;
+        float distanceScale = Vector3.Distance(points[0], points[1]);
 
         for (int i = 2; i < theSize - 1; i += 2)
         {
@@ -69,11 +78,17 @@ public class theoreticalMesh : MonoBehaviour {
                 //
             }
 
-            if (((angleValue + angleValue) / 2) < smoothingAngle)
+            if (((angleValue + angleValue2) / 2) < smoothingAngle)
             {
 
                 verts.Add(points[i]);
                 verts.Add(points[i + 1]);
+
+                uvDistance += Vector3.Distance(points[i], points[i - 2]) / distanceScale;
+
+                uvs.Add(new Vector2(uvDistance, 1));
+                uvs.Add(new Vector2(uvDistance, 0));
+
                 vertOffset += 2;
 
                 tris.Add(vertOffset - 3);
@@ -90,6 +105,15 @@ public class theoreticalMesh : MonoBehaviour {
                 verts.Add(points[i - 1]);
                 verts.Add(points[i]);
                 verts.Add(points[i + 1]);
+
+                uvs.Add(new Vector2(uvDistance, 1));
+                uvs.Add(new Vector2(uvDistance, 0));
+
+                uvDistance += Vector3.Distance(points[i], points[i - 2]) / distanceScale;
+
+                uvs.Add(new Vector2(uvDistance, 1));
+                uvs.Add(new Vector2(uvDistance, 0));
+
                 vertOffset += 4;
 
                 tris.Add(vertOffset - 3);
@@ -110,10 +134,76 @@ public class theoreticalMesh : MonoBehaviour {
     public void addNgon(Vector3 center, List<Vector3> points)
     {
         int theSize = points.Count;
-        for (int i = 0; i < theSize; i++)
+        int oldSize = verts.Count;
+
+        float averageDist = 0;
+        foreach (Vector3 p in points )
         {
-            addTriangle(center, points[i], points[(i + 1) % theSize]);
+            averageDist += Vector3.Distance(p, center);
         }
+        averageDist /= points.Count;
+
+        //to find the angle from A to C with pivot B:     Vector3.Angle(b - a, b - c);
+        float accumAngle = 0;
+
+        verts.Add(center);
+        Vector2 centerUV = new Vector2(.5f, .5f);
+        uvs.Add(centerUV);
+
+        verts.Add(points[0]);
+        uvs.Add(findNgonUVCoordinates(averageDist, Vector3.Distance(points[0], center), 0));
+
+        for (int i = 1; i < theSize; i++)
+        {
+            
+            verts.Add(points[i]);
+
+            accumAngle += Vector3.Angle(center - points[i - 1], center - points[i]);
+            float relativeAngle = Vector3.Angle(center - points[0], center - points[i]);
+            if(accumAngle > 180)
+            {
+                relativeAngle *= -1;
+            }
+
+            uvs.Add(findNgonUVCoordinates(averageDist, Vector3.Distance(points[i], center), relativeAngle));
+
+            tris.Add(oldSize);
+            tris.Add(oldSize + i);
+            tris.Add(oldSize + i + 1);
+
+        }
+
+        tris.Add(oldSize);
+        tris.Add(oldSize + theSize);
+        tris.Add(oldSize + 1);
+        
+    }
+
+    private Vector2 findNgonUVCoordinates(float avgDist, float distFromCenter, float angleFromPoint1)
+    {
+        Vector2 centerUV = new Vector2(.5f, .5f);
+        float UVdist = distFromCenter / avgDist;
+        Vector2 startVec = (Vector2.left * .5f) * UVdist;
+        
+        Vector2 answer = centerUV + startVec.Rotate(angleFromPoint1);
+        return answer;
+    }
+
+    //This version takes the average of the points and makes it the center
+    public void addNgon(List<Vector3> points)
+    {
+        float x = 0f;
+        float y = 0f;
+        float z = 0f;
+        foreach (Vector3 pos in points)
+        {
+            x += pos.x;
+            y += pos.y;
+            z += pos.z;
+        }
+        Vector3 center = new Vector3(x / points.Count, y / points.Count, z / points.Count);
+
+        addNgon(center, points);
     }
     /*
      * makes a cube. First four points are clockwise on top, 2nd four points are clockwise on bottom.
@@ -140,10 +230,32 @@ public class theoreticalMesh : MonoBehaviour {
         verts.Add(p2);
         verts.Add(p3);
 
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
+
         tris.Add(oldSize);
         tris.Add(oldSize + 1);
         tris.Add(oldSize + 2);
     }
+
+    public void addTriangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector2 u1, Vector2 u2, Vector2 u3)
+    {
+        int oldSize = verts.Count;
+
+        verts.Add(p1);
+        verts.Add(p2);
+        verts.Add(p3);
+
+        uvs.Add(u1);
+        uvs.Add(u2);
+        uvs.Add(u3);
+
+        tris.Add(oldSize);
+        tris.Add(oldSize + 1);
+        tris.Add(oldSize + 2);
+    }
+
     /*
      * takes 4 points and makes a 2-triangle quad (clockwise also faces up)
      */
@@ -155,6 +267,16 @@ public class theoreticalMesh : MonoBehaviour {
         verts.Add(p2);
         verts.Add(p3);
         verts.Add(p4);
+
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(1, 1));
+
+        float xScale = Vector3.Distance(p1, p2);
+        float yScale1 = Vector3.Distance(p2, p3) - xScale;
+        float yScale2 = Vector3.Distance(p1, p4) - xScale;
+
+        uvs.Add(new Vector2(1, 0 - yScale1));
+        uvs.Add(new Vector2(0, 0 - yScale2));
 
         tris.Add(oldSize);
         tris.Add(oldSize + 1);
@@ -173,6 +295,7 @@ public class theoreticalMesh : MonoBehaviour {
 
         newMesh.vertices = verts.ToArray();
         newMesh.triangles = tris.ToArray();
+        newMesh.uv = uvs.ToArray();
         newMesh.RecalculateNormals();
         newMesh.RecalculateBounds();
         newMesh.RecalculateTangents();
@@ -188,16 +311,40 @@ public class theoreticalMesh : MonoBehaviour {
         //verts = new List<Vector3>();
         //tris = new List<int>();
 
-        foreach(Vector3 v in aMesh.vertices)
+        for(int i = 0; i < aMesh.vertexCount; i ++)
         {
-            verts.Add(v);
+            verts.Add(aMesh.vertices[i]);
+
+            try
+            {
+                uvs.Add(aMesh.uv[i]);
+            }catch(Exception e)
+            {
+                uvs.Add(new Vector2(0, 0));
+            }
         }
 
         foreach (int i in aMesh.triangles)
         {
             tris.Add(i + offset);
         }
+
     }
 
+}
 
+public static class Vector2Extension
+{
+
+    public static Vector2 Rotate(this Vector2 v, float degrees)
+    {
+        float sin = Mathf.Sin(degrees * Mathf.Deg2Rad);
+        float cos = Mathf.Cos(degrees * Mathf.Deg2Rad);
+
+        float tx = v.x;
+        float ty = v.y;
+        v.x = (cos * tx) - (sin * ty);
+        v.y = (sin * tx) + (cos * ty);
+        return v;
+    }
 }

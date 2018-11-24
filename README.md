@@ -15,8 +15,9 @@ addQuad() - takes 4 points and makes a 2-triangle quad (clockwise also faces up)
 
 addNgon() - takes a list of points + middlepoint and makes a triangle fan with the midpoint in the center
 
-addCube() - makes a cube. First four points are clockwise on top, 2nd four points are clockwise on bottom.
+addRaisedNgon() - takes a list of points, a magnitude, and direction. It's an N-gon with added thiccness.
 
+addCube() - makes a cube. First four points are clockwise on top, 2nd four points are clockwise on bottom.
 
 addRibbon() - a ribbon is just a series of quads that are sowed together side by side. The list should have points in a zigzag pattern:
 

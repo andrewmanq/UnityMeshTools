@@ -2,6 +2,7 @@
 Makes mesh creation easier by adding an easily manipulated abstract mesh interface.
 
 # Here are all the methods in theoreticalMesh.cs so far:
+**mesh integration**
 
 adopt() takes a mesh as input and combines it with the rest of the mesh data.
 

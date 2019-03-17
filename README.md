@@ -1,6 +1,6 @@
 # UnityMeshTools
 Makes mesh creation easier by adding an easily manipulated abstract mesh interface.
-![Alt Text](https://gfycat.com/creativebrownkusimanse.gif)
+![Alt Text](https://gfycat.com/creativebrownkusimanse)
 
 # Here are all the methods in theoreticalMesh.cs so far:
 **mesh integration**

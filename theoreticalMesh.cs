@@ -3,6 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+/*This class makes mesh creation easier by adding an easily manipulated abstract mesh interface.
+* UV maps are automatically applied and scaled to correct proportions.
+*
+* Author: Andrew Quist
+*
+*
+* Usage: make a new theoreticalMesh object. Add polygons with the given functions.
+* When you're satisfied, use the constructMesh() function to generate the full mesh object
+* for use in Unity. Enjoy!
+*/
+
 public class theoreticalMesh {
 
     private List<Vector3> verts;
@@ -21,6 +32,9 @@ public class theoreticalMesh {
         adopt(aMesh);
     }
 
+    /*
+    * addRaisedNgon() - takes a list of points, a magnitude, and direction. It's an N-gon with added thiccness.
+    */
     public void addRaisedNgon(List<Vector3> points, float height, Vector3 direction, bool fillBottom)
     {
         List<Vector3> raisedPoints = new List<Vector3>();
